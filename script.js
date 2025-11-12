@@ -14,6 +14,68 @@ document.addEventListener('DOMContentLoaded', () => {
     let historyIndex = -1;
 
     // ----------------------------------------------------------------
+    // LOCAL STORAGE (INDEXEDDB)
+    // ----------------------------------------------------------------
+    let db;
+    const DB_NAME = 'DialogueEditorDB';
+    const STORE_NAME = 'charactersStore';
+    const DATA_KEY = 'mainCharacterData';
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = event => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            request.onsuccess = event => {
+                db = event.target.result;
+                console.log("Database initialized successfully.");
+                resolve(db);
+            };
+            request.onerror = event => {
+                console.error("Database error:", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+
+    function saveData(data) {
+        if (!db) return;
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        // We use JSON.stringify because IndexedDB can have issues with complex objects (like Sets)
+        store.put(JSON.stringify(data), DATA_KEY);
+    }
+
+    function loadData() {
+        return new Promise((resolve, reject) => {
+            if (!db) {
+                reject("Database not initialized.");
+                return;
+            }
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get(DATA_KEY);
+
+            request.onsuccess = event => {
+                if (event.target.result) {
+                    resolve(JSON.parse(event.target.result));
+                } else {
+                    resolve(null); // No data found
+                }
+            };
+
+            request.onerror = event => {
+                console.error("Error loading data:", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+
+    // ----------------------------------------------------------------
     // ELEMENT SELECTORS
     // ----------------------------------------------------------------
     const homePage = document.getElementById('home-page'), 
@@ -72,20 +134,25 @@ document.addEventListener('DOMContentLoaded', () => {
         history.push(state);
         historyIndex++;
         updateUndoRedoButtons();
+        saveData(state); // Save to IndexedDB on every state change
     };
 
     const undo = () => {
         if (undoBtn.classList.contains('disabled')) return;
         historyIndex--;
-        loadState(history[historyIndex]);
+        const state = history[historyIndex];
+        loadState(state);
+        saveData(state); // Save the undone state to DB
     };
-
+    
     const redo = () => {
         if (redoBtn.classList.contains('disabled')) return;
         historyIndex++;
-        loadState(history[historyIndex]);
+        const state = history[historyIndex];
+        loadState(state);
+        saveData(state); // Save the redone state to DB
     };
-
+    
     const loadState = (state) => {
         characters = JSON.parse(JSON.stringify(state));
         if (currentCharacterId && characters[currentCharacterId]) {
@@ -359,12 +426,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // INITIALIZATION
     // ----------------------------------------------------------------
     
-    // Set up event listeners first
-    homeBtn.addEventListener('click', showHomePage);
-    undoBtn.addEventListener('click', undo);
-    redoBtn.addEventListener('click', redo);
-    // ... all other listeners are already set up above
+    async function initializeApp() {
+        // First, set up all the event listeners
+        homeBtn.addEventListener('click', showHomePage);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
 
-    // Initialize the app state
-    saveState();
+        try {
+            await initDB();
+            const loadedCharacters = await loadData();
+            if (loadedCharacters && Object.keys(loadedCharacters).length > 0) {
+                characters = loadedCharacters;
+                console.log("Loaded data from IndexedDB.");
+            } else {
+                console.log("No local data found, starting fresh.");
+            }
+        } catch (error) {
+            console.error("Failed to load data from IndexedDB, starting fresh.", error);
+        }
+        
+        renderCharacters(); // Render whatever is in 'characters' (loaded or empty)
+        // Push the initial state (loaded or fresh) to the history for undo/redo
+        const initialState = JSON.parse(JSON.stringify(characters));
+        history.push(initialState);
+        historyIndex = 0;
+        updateUndoRedoButtons();
+    }
+
+    // Kick off the app
+    initializeApp();
 });
