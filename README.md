@@ -1,7 +1,4 @@
-## DialogueMaker
-Helps making dialogue options for videogames.
-
-# HOW TO USE
+# DialogueMaker 🖌️ - HOW TO USE
 ## Home page
 This is where all your characters will be! <br>
 You can add more characters by clicking the 👤 button. <br>
