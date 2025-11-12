@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialogue Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="toolbar">
+        <div class="tool-item" id="home-btn" title="Home">🏠</div>
+        <!-- New Undo/Redo Buttons -->
+        <div class="tool-item" id="undo-btn" title="Undo (Ctrl+Z)">↩️</div>
+        <div class="tool-item" id="redo-btn" title="Redo (Ctrl+Y)">↪️</div>
+        <!-- Contextual Tools -->
+        <div class="tool-item" id="add-character-tool" title="Add Character">👤+</div>
+        <div class="tool-item hidden" id="add-node-tool" title="Add New Node">➕</div>
+        <div class="tool-item" id="character-color-tool" title="Character Color">
+            <label for="character-color-picker">🎨</label>
+            <input type="color" id="character-color-picker" value="#ffcc00">
+        </div>
+        <div class="tool-item hidden" id="node-color-tool" title="Node Color">
+            <label for="node-color-picker">🎨</label>
+            <input type="color" id="node-color-picker" value="#a3d5e8">
+        </div>
+        <!-- End Contextual Tools -->
+    </div>
+
+    <div id="main-content">
+        <div id="home-page">
+            <div id="home-canvas-wrapper">
+                <div id="home-canvas"></div>
+            </div>
+        </div>
+
+        <div id="dialogue-editor-page" class="hidden">
+            <div id="editor-header">
+                <h1 id="character-header-name">Character</h1>
+            </div>
+            <div id="editor-canvas-wrapper">
+                <div id="editor-canvas">
+                    <svg id="connector-lines"></svg>
+                </div>
+            </div>
+        </div>
+
+    <div id="popup-overlay" class="hidden">
+        <!-- Create Character Popup -->
+        <div id="create-character-popup" class="popup-content hidden">
+            <span class="close-popup">&times;</span>
+            <h2>Create New Character</h2>
+            <label for="character-name-input">Character Name:</label>
+            <input type="text" id="character-name-input" placeholder="Enter name">
+            <label for="character-color-input">Character Color:</label>
+            <input type="color" id="character-color-input" value="#ffcc00">
+            <button id="save-character-btn">Create</button>
+        </div>
+
+        <!-- Edit Character Popup -->
+        <div id="edit-character-popup" class="popup-content hidden">
+            <span class="close-popup">&times;</span>
+            <h2>Edit Character</h2>
+            <label for="edit-character-name">Character Name:</label>
+            <input type="text" id="edit-character-name">
+            <label for="edit-character-icon">Character Icon (Emoji):</label>
+            <input type="text" id="edit-character-icon" maxlength="2">
+            <button id="save-character-info-btn">Save Changes</button>
+        </div>
+
+        <!-- Create Option / Create Root Node Popup -->
+        <div id="option-popup" class="popup-content hidden">
+            <span class="close-popup">&times;</span>
+            <h2 id="option-popup-title">Create Option</h2>
+            <div class="form-field" id="option-text-field">
+                <label for="option-text">Option (Text on arrow):</label>
+                <input type="text" id="option-text">
+            </div>
+            <label for="resulting-dialogue" id="dialogue-label">Resulting Dialogue:</label>
+            <textarea id="resulting-dialogue"></textarea>
+            <label for="notes">Notes (Rewards, points, etc.):</label>
+            <textarea id="notes"></textarea>
+            <button id="save-option-btn">Save Option</button>
+        </div>
+
+        <!-- EDITABLE Node Information Popup -->
+        <div id="node-info-popup" class="popup-content hidden">
+            <span class="close-popup">&times;</span>
+            <h2>Edit Node Information</h2>
+            <label for="edit-dialogue-textarea">Dialogue:</label>
+            <textarea id="edit-dialogue-textarea"></textarea>
+            <label for="edit-notes-textarea">Notes:</label>
+            <textarea id="edit-notes-textarea"></textarea>
+            <button id="save-node-info-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

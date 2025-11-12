@@ -1,0 +1,269 @@
+:root {
+    --toolbar-width: 60px;
+    --home-bg: #f7f6d5;
+    --editor-bg: #f0f2f5;
+    --grid-color: #ddd;
+    --selection-color: #007bff;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+#toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--toolbar-width);
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 100;
+}
+
+.tool-item {
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    position: relative;
+}
+/* New style for disabled buttons */
+.tool-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tool-item input[type="color"] {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+#main-content {
+    margin-left: var(--toolbar-width);
+    width: calc(100vw - var(--toolbar-width));
+    height: 100vh;
+}
+
+#home-page, #dialogue-editor-page {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#home-canvas {
+    background-color: var(--home-bg);
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.character-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+.character-node:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+.character-node.selected {
+    outline: 3px solid var(--selection-color);
+    outline-offset: 1px;
+}
+.character-icon {
+    font-size: 30px;
+}
+.edit-char-btn {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    font-size: 16px;
+    display: none;
+    background: rgba(255,255,255,0.5);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+.character-node:hover .edit-char-btn {
+    display: block;
+}
+
+#dialogue-editor-page {
+    display: flex;
+    flex-direction: column;
+}
+
+#editor-header {
+    padding: 10px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+#editor-header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+#editor-canvas {
+    flex-grow: 1;
+    position: relative;
+    background-color: var(--editor-bg);
+    background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.dialogue-node {
+    position: absolute;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid #999;
+    cursor: grab;
+    user-select: none;
+    min-width: 150px;
+    text-align: left;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.dialogue-node.path-highlight {
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+    border-color: #ffc107;
+}
+.dialogue-node.selected {
+    outline: 3px solid var(--selection-color);
+    outline-offset: 1px;
+}
+
+.node-text {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.create-option-btn {
+    width: 100%;
+    padding: 5px 10px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #f9f9f9;
+    margin-top: 5px;
+}
+.create-option-btn:hover {
+    background: #f0f0f0;
+}
+
+.connection-handle {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 2px solid #555;
+    border-radius: 50%;
+    cursor: crosshair;
+    display: none;
+    z-index: 10;
+}
+.dialogue-node:hover .connection-handle {
+    display: block;
+}
+
+
+#connector-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+#connector-lines text, #connector-lines .line-hitbox {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.inline-edit-input {
+    position: absolute;
+    background: #fff;
+    border: 1px solid var(--selection-color);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: center;
+    padding: 1px;
+    z-index: 101;
+}
+
+.hidden { display: none !important; }
+
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 450px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+.popup-content h2 { margin-top: 0; margin-bottom: 20px; }
+.popup-content label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+.popup-content input, .popup-content textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+.popup-content textarea { min-height: 80px; resize: vertical; }
+.popup-content button { margin-top: 20px; padding: 12px 20px; width: 100%; background-color: var(--selection-color); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+.popup-content button:hover { background-color: #0056b3; }
+.close-popup { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #888; }
+#option-popup.root-mode #option-text-field { display: none; }
+
+/* Infinite canvas scroll areas */
+#home-canvas-wrapper,
+#editor-canvas-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+    position: relative;
+}
+
+/* Large working area (like an infinite canvas) */
+#home-canvas,
+#editor-canvas {
+    width: 5000px;   /* adjust as needed */
+    height: 5000px;
+    position: relative;
+    background-size: 20px 20px;
+}
+
+/* Optional: make grid visible across the whole area */
+#editor-canvas {
+    background-color: var(--editor-bg);
+    background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px);
+}
